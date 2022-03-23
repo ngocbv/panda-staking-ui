@@ -605,6 +605,7 @@ export default function Stake() {
                                                                     </svg>
                                                                 </span>
                                                             </button>
+                                                            <div style={{fontSize: 12, marginTop: 10}}>Your PANDA will be locked for 30 days and you can claim reward anytime</div>
                                                         </div>
                                                     </div>
                                                     <div className="chakra-tabs__tab-panel css-n8lhb7" hidden={selectedSTab !== 1}>
