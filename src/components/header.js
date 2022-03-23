@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Wallet from './wallet';
 import '../styles/Header.css';
-import logo from '../assets/imgs/logo.svg';
+import logo from '../assets/imgs/logo_with_name.png';
 import {
     WalletModalProvider,
     WalletDisconnectButton,
@@ -16,16 +16,9 @@ export default function Header() {
                     <div className="chakra-stack css-1i0wgq1">
                         <div className="chakra-stack css-oft45e">
                             <a href="/">
-                                <div className="gatsby-image-wrapper gatsby-image-wrapper-constrained">
-                                    <div data-gatsby-image-wrapper="" className="gatsby-image-wrapper gatsby-image-wrapper-constrained">
-                                        <img src={logo} className="logo"></img>
-                                    </div>
-                                </div>
+                              <img width="200" src={logo} className="logo"></img>
                             </a>
                         </div>
-                    </div>
-                    <div className="chakra-stack css-n4g6ml">
-                        <a className="chakra-link css-r7163r" href="/app/staking" aria-current="page" style={{ display: 'inline-block', opacity: 1, borderBottom: '3px solid' }}>Stake</a>
                     </div>
                     <div className="chakra-stack css-1u6kme8">
                         <WalletModalProvider>

@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 import { Connection, PublicKey } from '@solana/web3.js';
 import { Program, Provider, web3, BN } from '@project-serum/anchor';
 import { TOKEN_PROGRAM_ID, Token } from "@solana/spl-token";
 
 import '../styles/Stake.css';
-import phantIcon from '../assets/imgs/logo.png';
+import pandaIcon from '../assets/imgs/logo.png';
 import idl from '../json/idl.json';
 
 import {
@@ -24,12 +27,13 @@ export default function Stake() {
     const [selectedSTab, setSelectedSTab] = useState(0);
     const [selectedUSTab, setSelectedUSTab] = useState(0);
     const [selectedTab, setSelectedTab] = useState(0);
-    const [phantStakeAmount, setPhantStakeAmount] = useState('');
-    const [phantUnstakeAmount, setPhantUnstakeAmount] = useState('');
+    const [pandaStakeAmount, setPandaStakeAmount] = useState('');
+    const [pandaUnstakeAmount, setPandaUnstakeAmount] = useState('');
     const [totalStackedPHANT, setTotalStackedPHANT] = useState(0.0);
     const [totalUnstakedPHANT, setTotalUnstakedPHANT] = useState(0.0);
     const [earn, setEarn] = useState(0.0);
     const [balance, setBalance] = useState(0.0);
+    const [stakedAmount, setStakedAmount] = useState(0.0);
 
     const { connection } = useConnection();
 
@@ -42,15 +46,15 @@ export default function Stake() {
     }
 
     async function stake() {
-        let amount = parseFloat(phantStakeAmount);
+        let amount = parseFloat(pandaStakeAmount);
         if (isNaN(amount) || amount === 0) {
-            alert("Amount is zero.");
+            toast.error("Amount is zero.", { theme: "dark" });
             return;
         }
 
         const maxAmount = await getTokenBalance(new PublicKey(process.env.REACT_APP_PHANT_STAKE_TOKEN_ID));
         if (amount > maxAmount) {
-            alert("Not enough token amount.");
+            toast.error("Not enough token amount.", { theme: "dark" });
             return;
         }
 
@@ -111,22 +115,26 @@ export default function Stake() {
                     },
                 }
             );
+            toast.success("Stake PANDA successfully!", { theme: "dark" });
+            setPandaStakeAmount(0);
+            await refreshPage();
         } catch (err) {
             console.log("Transaction error: ", err);
+            toast.error("Transaction error, try again later!", { theme: "dark" });
         }
     }
 
     async function unstake() {
 
-        let amount = parseFloat(phantUnstakeAmount);
+        let amount = parseFloat(pandaUnstakeAmount);
         if (isNaN(amount) || amount === 0) {
-            alert("Amount is zero.");
+            toast.error("Amount is zero", { theme: "dark" });
             return;
         }
 
         const maxAmount = await getStakedBalance();
         if (amount > maxAmount) {
-            alert("Not enough token amount.");
+            toast.error("Not enough token amount.", { theme: "dark" });
             return;
         }
 
@@ -178,8 +186,12 @@ export default function Stake() {
                         tokenProgram: TOKEN_PROGRAM_ID,
                     },
                 });
+            toast.success("Unstake PANDA successfully!", { theme: "dark" });
+            await refreshPage();
+            setPandaUnstakeAmount(0);
         } catch (err) {
             console.log("Transaction error: ", err);
+            toast.error("Transaction error, try again later!", { theme: "dark" });
         }
     }
 
@@ -235,8 +247,10 @@ export default function Stake() {
                     tokenProgram: TOKEN_PROGRAM_ID,
                 },
             });
+            toast.success("Claim PANDA successfully!", { theme: "dark" });
+            setEarn(0.0);
         } catch (e) {
-
+          toast.error("Transaction error, try again later!", { theme: "dark" });
         }
 
         return await getTokenBalance(new PublicKey(process.env.REACT_APP_PHANT_STAKE_TOKEN_ID));
@@ -368,11 +382,11 @@ export default function Stake() {
     }
 
     async function setMaxValue() {
-        setPhantStakeAmount(await getTokenBalance(new PublicKey(process.env.REACT_APP_PHANT_STAKE_TOKEN_ID)));
+        setPandaStakeAmount(await getTokenBalance(new PublicKey(process.env.REACT_APP_PHANT_STAKE_TOKEN_ID)));
     }
 
     async function setUnstakeMaxValue() {
-        setPhantUnstakeAmount(await getStakedBalance());
+        setPandaUnstakeAmount(await getStakedBalance());
     }
 
     async function createStakeAccount() {
@@ -397,7 +411,7 @@ export default function Stake() {
             });
         } catch (e) {
             if (e.message == 'failed to send transaction: Transaction simulation failed: Attempt to debit an account but found no record of a prior credit.') {
-                alert("You need to charge at least 0.00001 sol");
+                toast.error("You need to charge at least 0.00001 sol", { theme: "dark" });
             }
         }
     }
@@ -421,9 +435,9 @@ export default function Stake() {
         );
 
         setBalance(await getTokenBalance(new PublicKey(process.env.REACT_APP_PHANT_STAKE_TOKEN_ID)));
+        setStakedAmount(await getStakedBalance());
         try {
             const accountData = await program.account.user.fetch(_userPubkey);
-            console.log(accountData)
             let lastUpdated = accountData.lastUpdateTime.toNumber();
             let now = parseInt((new Date()).getTime() / 1000);
             let diff = now - lastUpdated;
@@ -436,23 +450,28 @@ export default function Stake() {
         }
     }
 
-    useEffect(async () => {
+    const refreshPage = async () => {
 
-        const balance = await getTotalStakedBalance(new PublicKey(process.env.REACT_APP_PHANT_STAKE_TOKEN_ID));
-        setTotalStackedPHANT(balance);
+        // const balance = await getTotalStakedBalance(new PublicKey(process.env.REACT_APP_PHANT_STAKE_TOKEN_ID));
+        // console.log("balance", balance)
+        // setTotalStackedPHANT(balance);
 
-        const ubalance = await getTotalUnstakedBalance(new PublicKey(process.env.REACT_APP_PHANT_STAKE_TOKEN_ID));
-        setTotalUnstakedPHANT(ubalance);
+        // const ubalance = await getTotalUnstakedBalance(new PublicKey(process.env.REACT_APP_PHANT_STAKE_TOKEN_ID));
+        // setTotalUnstakedPHANT(ubalance);
 
         await getEarned()
 
         return () => {
 
         }
-    }, [wallet])
+    }
+
+    useEffect(refreshPage, [wallet])
 
     return (
         <div>
+            <ToastContainer />
+            <h1 style={{textAlign: "center"}}>Staking Pool V1</h1>
             <div className="css-3c6eg3">
                 <div className="css-1m984bj">
                     <div className="css-1ipn2vc">
@@ -460,28 +479,30 @@ export default function Stake() {
                             <div className="chakra-stack css-keb7u0">
                                 <div className="chakra-stat css-1mbo1ls">
                                     <dl>
-                                        <dt className="chakra-stat__label css-1ovag0s">Wallet(balance: {balance})</dt>
+                                        <dt className="chakra-stat__label css-1ovag0s">Wallet (balance: {balance})</dt>
                                         <div className="chakra-stack css-1y05o36">
                                             <div>
-                                                <img width="35" height="35" sizes="(min-width: 35px) 35px, 100vw" decoding="async" src={phantIcon} style={{ maxWidth: 45 }} />
+                                                <img width="35" height="35" sizes="(min-width: 35px) 35px, 100vw" decoding="async" src={pandaIcon} style={{ maxWidth: 45 }} />
                                             </div>
-                                            <dd className="chakra-stat__number css-1u32qky">
+                                            <dd className="chakra-stat__number css-1u32qky" style={{marginLeft: 10}}>
                                                 <div className="chakra-stack css-qf81zg">
-                                                    <p>PHANT</p>
+                                                    <p>{` PANDA`}</p>
                                                 </div>
                                             </dd>
-                                            <div style={{ marginLeft: 20 }}>You earned: {earn} PHANT</div>
-                                            <div style={{ marginLeft: 10, padding: 5, borderWidth: 1, borderStyle: 'solid', borderRadius: 5 }}>
-                                                <button onClick={(e) => claim()}>Claim</button>
+                                            <div style={{ marginLeft: 20 }}>
+                                              <span>{`Your reward: `}</span>
+                                              <span style={{fontWeight: "bold"}}>{earn}</span>
+                                              <span>{` PANDA`}</span>
                                             </div>
                                             <div style={{ marginLeft: 10, padding: 5, borderWidth: 1, borderStyle: 'solid', borderRadius: 5 }}>
-                                                <button onClick={(e) => createStakeAccount()}>Create Stake Account</button>
+                                                <button onClick={(e) => claim()}>Claim now</button>
                                             </div>
                                         </div>
                                     </dl>
                                 </div>
                             </div>
                         </div>
+                        {false && (
                         <div className="css-17zb26e">
                             <div className="chakra-stack css-s7z0if">
                                 <div className="chakra-stat css-1iodnbg">
@@ -492,7 +513,7 @@ export default function Stake() {
                                                 <dd className="chakra-stat__number css-1loxz6u">
                                                     <div className="chakra-stack css-8320s1">
                                                         <div className="css-yslke8">{totalStackedPHANT}</div>
-                                                        <p>PHANT</p>
+                                                        <p>PANDA</p>
                                                     </div>
                                                 </dd>
                                                 {/*<dd className="chakra-stat__help-text css-o0h8lz">≈ $1,477,119,462</dd>*/}
@@ -509,7 +530,7 @@ export default function Stake() {
                                                 <dd className="chakra-stat__number css-1loxz6u">
                                                     <div className="chakra-stack css-8320s1">
                                                         <div className="css-yslke8">{totalUnstakedPHANT}</div>
-                                                        <p>PHANT</p>
+                                                        <p>PANDA</p>
                                                     </div>
                                                 </dd>
                                                 {/*<dd className="chakra-stat__help-text css-o0h8lz">≈ $110,578,305</dd>*/}
@@ -518,7 +539,8 @@ export default function Stake() {
                                     </dl>
                                 </div>
                             </div>
-                        </div>
+                          </div>
+                        )}
                     </div>
                 </div>
                 <div style={{ outline: 'none' }}>
@@ -541,16 +563,8 @@ export default function Stake() {
                                     <div className="chakra-stack css-100uh2e">
                                         <div className="css-1kw2fa0">
                                             <div className="chakra-tabs css-13o7eu2">
-                                                <div role="tablist" aria-orientation="horizontal" className="chakra-tabs__tablist css-1xkrqte">
-                                                    <span style={{ flex: 1 }}></span>
-                                                    <button
-                                                        aria-selected={selectedSTab == 0}
-                                                        className="chakra-tabs__tab css-jbal0r"
-                                                        onClick={(e) => setSelectedSTab(0)}
-                                                    >
-                                                        <span className="chakra-text headline css-0">Stake PHANT</span>
-                                                    </button>
-                                                    <span style={{ flex: 1 }}></span>
+                                                <div style={{paddingTop: 10}}>
+                                                  {`Your staked amount: ${stakedAmount} PANDA`}
                                                 </div>
                                                 <div className="chakra-tabs__tab-panels css-8atqhb">
                                                     <div className="chakra-tabs__tab-panel css-n8lhb7" hidden={selectedSTab !== 0}>
@@ -561,15 +575,15 @@ export default function Stake() {
                                                                         <div data-gatsby-image-wrapper="" className="gatsby-image-wrapper gatsby-image-wrapper-constrained">
                                                                             <div style={{ maxWidth: 20, display: 'block', width: 20, height: 20 }}>
                                                                                 <picture>
-                                                                                    <source type="image/svg" src={phantIcon} sizes="(min-width: 20px) 20px, 100vw" />
-                                                                                    <img width="20" height="20" sizes="(min-width: 20px) 20px, 100vw" decoding="async" src={phantIcon} alt="mSOL" style={{ objectFit: 'cover', opacity: 1, maxWidth: 20 }} />
+                                                                                    <source type="image/svg" src={pandaIcon} sizes="(min-width: 20px) 20px, 100vw" />
+                                                                                    <img width="20" height="20" sizes="(min-width: 20px) 20px, 100vw" decoding="async" src={pandaIcon} alt="mSOL" style={{ objectFit: 'cover', opacity: 1, maxWidth: 20 }} />
                                                                                 </picture>
                                                                             </div>
                                                                         </div>
-                                                                        <p className="chakra-text css-2ygcmq">PHANT</p>
+                                                                        <p className="chakra-text css-2ygcmq">PANDA</p>
                                                                     </div>
                                                                     <div className="chakra-numberinput css-17wygfg">
-                                                                        <input className="phantInput" placeholder="0.0" type="text" value={phantStakeAmount} onChange={e => setPhantStakeAmount(e.target.value)} />
+                                                                        <input className="phantInput" placeholder="0.0" type="text" value={pandaStakeAmount} onChange={e => setPandaStakeAmount(e.target.value)} />
                                                                         <div className="chakra-input__right-element css-60m06v">
                                                                             <button
                                                                                 type="button"
@@ -605,16 +619,8 @@ export default function Stake() {
                                     <div className="chakra-stack css-100uh2e">
                                         <div className="css-1kw2fa0">
                                             <div className="chakra-tabs css-13o7eu2">
-                                                <div className="chakra-tabs__tablist css-1xkrqte">
-                                                    <span style={{ flex: 1 }}></span>
-                                                    <button
-                                                        aria-selected={selectedUSTab == 0}
-                                                        className="chakra-tabs__tab css-jbal0r"
-                                                        onClick={(e) => setSelectedUSTab(0)}
-                                                    >
-                                                        <span className="chakra-text headline css-0">Unstake now</span>
-                                                    </button>
-                                                    <span style={{ flex: 1 }}></span>
+                                                <div style={{paddingTop: 10}}>
+                                                  {`Your staked amount: ${stakedAmount} PANDA`}
                                                 </div>
                                                 <div className="chakra-tabs__tab-panels css-8atqhb">
                                                     <div className="chakra-tabs__tab-panel css-n8lhb7" hidden={selectedUSTab !== 0}>
@@ -625,15 +631,15 @@ export default function Stake() {
                                                                         <div data-gatsby-image-wrapper="" className="gatsby-image-wrapper gatsby-image-wrapper-constrained">
                                                                             <div style={{ maxWidth: 20, display: 'block', width: 20, height: 20 }}>
                                                                                 <picture>
-                                                                                    <source type="image/svg" src={phantIcon} sizes="(min-width: 20px) 20px, 100vw" />
-                                                                                    <img width="20" height="20" sizes="(min-width: 20px) 20px, 100vw" decoding="async" src={phantIcon} alt="mSOL" style={{ objectFit: 'cover', opacity: 1, maxWidth: 20 }} />
+                                                                                    <source type="image/svg" src={pandaIcon} sizes="(min-width: 20px) 20px, 100vw" />
+                                                                                    <img width="20" height="20" sizes="(min-width: 20px) 20px, 100vw" decoding="async" src={pandaIcon} alt="mSOL" style={{ objectFit: 'cover', opacity: 1, maxWidth: 20 }} />
                                                                                 </picture>
                                                                             </div>
                                                                         </div>
-                                                                        <p className="chakra-text css-2ygcmq">PHANT</p>
+                                                                        <p className="chakra-text css-2ygcmq">PANDA</p>
                                                                     </div>
                                                                     <div className="chakra-numberinput css-17wygfg">
-                                                                        <input className="phantInput" placeholder="0.0" type="text" value={phantUnstakeAmount} onChange={e => setPhantUnstakeAmount(e.target.value)} />
+                                                                        <input className="phantInput" placeholder="0.0" type="text" value={pandaUnstakeAmount} onChange={e => setPandaUnstakeAmount(e.target.value)} />
                                                                         <div className="chakra-input__right-element css-60m06v">
                                                                             <button
                                                                                 type="button"
