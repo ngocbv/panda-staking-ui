@@ -15,10 +15,7 @@ function App() {
             <Header />
             <Router>
               <Switch>
-                <Route exact path="/">
-                  <Redirect to="/stake" />
-                </Route>
-                <Route exact path="/stake" component={Stake} />
+                <Route exact path="/" component={Stake} />
                 <Route component={Error404} />
               </Switch>
             </Router>

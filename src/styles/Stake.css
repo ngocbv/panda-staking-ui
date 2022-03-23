@@ -664,6 +664,11 @@
     margin-top: 1rem;
     color: #171923;
 }
+
+.css-zu7fla:disabled {
+  background: gray;
+}
+
 .css-2ygcmq {
     font-weight: 600;
 }

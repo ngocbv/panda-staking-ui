@@ -2,7 +2,7 @@
   "name": "xhashtag-staking-ui",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://ngocbv.github.io/panda-staking-ui",
+  "homepage": "https://staking.pandacrypto.org",
   "dependencies": {
     "@emotion/react": "^11.5.0",
     "@emotion/styled": "^11.3.0",
@@ -40,6 +40,7 @@
     "notistack": "^2.0.3",
     "react": "^17.0.2",
     "react-chartist": "^0.14.4",
+    "react-countdown": "^2.3.2",
     "react-countup": "^6.1.1",
     "react-dom": "^17.0.2",
     "react-image": "^4.0.3",

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Countdown from "react-countdown";
 
 import { Connection, PublicKey } from '@solana/web3.js';
 import { Program, Provider, web3, BN } from '@project-serum/anchor';
@@ -34,6 +35,7 @@ export default function Stake() {
     const [earn, setEarn] = useState(0.0);
     const [balance, setBalance] = useState(0.0);
     const [stakedAmount, setStakedAmount] = useState(0.0);
+    const [stakeTimestamp, setStakeTimestamp] = useState(0);
 
     const { connection } = useConnection();
 
@@ -373,6 +375,7 @@ export default function Stake() {
 
         try {
             const accountData = await program.account.user.fetch(_userPubkey);
+            setStakeTimestamp(accountData.stakeTime.toNumber() * 1000);
             return (accountData.balanceStaked.toNumber() / web3.LAMPORTS_PER_SOL).toFixed(6);
         } catch (e) {
             console.log(e.message)
@@ -650,7 +653,16 @@ export default function Stake() {
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                            <button type="button" className="chakra-button css-zu7fla" onClick={() => unstake()}>
+                                                            <div>
+                                                              <span>You have to wait</span>
+                                                              <span>{" "}</span>
+                                                              <span style={{fontWeight: "bold"}}>
+                                                                <Countdown date={stakeTimestamp + 30 * 24 * 3600 * 1000} />
+                                                              </span>
+                                                              <span>{" "}</span>
+                                                              <span>to unstake</span>
+                                                            </div>
+                                                            <button disabled={stakeTimestamp + 30 * 24 * 3600 * 1000 > Date.now()} type="button" className="chakra-button css-zu7fla" onClick={() => unstake()}>
                                                                 Unstake now
                                                                 <span className="chakra-button__icon css-1hzyiq5">
                                                                     <svg viewBox="0 0 24 24" focusable="false" className="chakra-icon css-onkibi" aria-hidden="true">
