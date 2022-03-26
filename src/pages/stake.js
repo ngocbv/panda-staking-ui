@@ -376,7 +376,7 @@ export default function Stake() {
         try {
             const accountData = await program.account.user.fetch(_userPubkey);
             setStakeTimestamp(accountData.stakeTime.toNumber() * 1000);
-            return (accountData.balanceStaked.toNumber() / web3.LAMPORTS_PER_SOL).toFixed(6);
+            return (Number.parseInt(accountData.balanceStaked.toString()) / web3.LAMPORTS_PER_SOL).toFixed(6);
         } catch (e) {
             console.log(e.message)
             return 0;
@@ -445,8 +445,8 @@ export default function Stake() {
             let now = parseInt((new Date()).getTime() / 1000);
             let diff = now - lastUpdated;
 
-            let val = (accountData.rewardBRate.toNumber() / web3.LAMPORTS_PER_SOL) * diff;
-            val += accountData.rewardB.toNumber() / web3.LAMPORTS_PER_SOL;
+            let val = (Number.parseInt(accountData.rewardBRate.toString()) / web3.LAMPORTS_PER_SOL) * diff;
+            val += Number.parseInt(accountData.rewardB.toString()) / web3.LAMPORTS_PER_SOL;
             setEarn(val.toFixed(6));
         } catch (e) {
 
@@ -455,9 +455,8 @@ export default function Stake() {
 
     const refreshPage = async () => {
 
-        // const balance = await getTotalStakedBalance(new PublicKey(process.env.REACT_APP_PHANT_STAKE_TOKEN_ID));
-        // console.log("balance", balance)
-        // setTotalStackedPHANT(balance);
+        const balance = await getTotalStakedBalance(new PublicKey(process.env.REACT_APP_PHANT_STAKE_TOKEN_ID));
+        setTotalStackedPHANT(balance);
 
         // const ubalance = await getTotalUnstakedBalance(new PublicKey(process.env.REACT_APP_PHANT_STAKE_TOKEN_ID));
         // setTotalUnstakedPHANT(ubalance);
@@ -525,6 +524,7 @@ export default function Stake() {
                                     </dl>
                                 </div>
                                 <hr aria-orientation="vertical" className="chakra-divider css-6cji22"></hr>
+                                { false && (
                                 <div className="chakra-stat css-1sps1hr">
                                     <dl>
                                         <dt className="chakra-stat__label css-1cvxnhk">Unstake liquidity</dt>
@@ -541,6 +541,7 @@ export default function Stake() {
                                         </div>
                                     </dl>
                                 </div>
+                                )}
                             </div>
                           </div>
                         )}

@@ -338,7 +338,7 @@ class User {
     async getUserPendingRewardsFunction() {
         return await User.getPendingRewardsFunction(this.program, this.poolPubkey);
     }
-    
+
     // *returns a function* that when called returns an array of 2 values, the pending rewardA and rewardB
     // this function is accurate forever (even after pool ends), unless the pool is changed through
     // funding, or anyone staking/unstaking.
@@ -388,15 +388,15 @@ class User {
         //a function that gives a user's total unclaimed rewards since last update
         let currentPending = () => {
             var rwds = fnAllRewardsPerToken();
-            var a = balanceStaked.mul(rwds[0]).sub(completeA).div(U64_MAX).add(pendingA).toNumber();
+            var a = Number.parseInt(balanceStaked.mul(rwds[0]).sub(completeA).div(U64_MAX).add(pendingA).toString());
             var b;
             if (singleStaking) {
                 b = 0;
             } else {
-                b = balanceStaked.mul(rwds[1]).sub(completeB).div(U64_MAX).add(pendingB).toNumber();
+                b = Number.parseInt(balanceStaked.mul(rwds[1]).sub(completeB).div(U64_MAX).add(pendingB).toString());
             }
             return [a, b];
-            
+
         }
 
         return currentPending;
@@ -492,7 +492,7 @@ class User {
                 tokenProgram: TOKEN_PROGRAM_ID,
             },
         });
-        
+
         await this.program.rpc.unstake(
             new anchor.BN(amount),
             {
@@ -538,9 +538,9 @@ class User {
     async closePool() {
         let poolObject = await this.program.account.pool.fetch(this.poolPubkey);
 
-        const [ configPubkey, ___nonce] = 
+        const [ configPubkey, ___nonce] =
             await anchor.web3.PublicKey.findProgramAddress(
-                [Buffer.from("config")], 
+                [Buffer.from("config")],
                 this.program.programId
             );
 
