@@ -2203,10 +2203,10 @@
     "@types/keccak" "^3.0.1"
     "@types/readable-stream" "^2.3.11"
 
-"@solana/wallet-adapter-wallets@^0.11.2":
-  version "0.11.2"
-  resolved "https://registry.yarnpkg.com/@solana/wallet-adapter-wallets/-/wallet-adapter-wallets-0.11.2.tgz#93d09eb0845f3009185abf3fab0b4d467bc526db"
-  integrity sha512-XdG7sesy5rimJe28kORvNStZ7JE3MZ9ySVisE3jNVyuu6cjOywpDU4PTIxbXz2eCZhL5yjk5FUMUJJa84/vBZw==
+"@solana/wallet-adapter-wallets@^0.11.3":
+  version "0.11.3"
+  resolved "https://registry.yarnpkg.com/@solana/wallet-adapter-wallets/-/wallet-adapter-wallets-0.11.3.tgz#66d16ca75d375db32fcb748d08155a2ee9ac697a"
+  integrity sha512-SiPampUuHYlN9QJfeScH8wZSuCk7GrwuYpb1kzi0N7oqtRf/baxXmZDQFKgWIP/L49FqCEtFmCaAkck0vi8bFA==
   dependencies:
     "@solana/wallet-adapter-bitkeep" "^0.1.0"
     "@solana/wallet-adapter-bitpie" "^0.3.0"
