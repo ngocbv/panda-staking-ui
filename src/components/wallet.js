@@ -36,14 +36,14 @@ export default function SolWalletProvider({ children = null }) {
     // Only the wallets you configure here will be compiled into your application
     const wallets = useMemo(() => [
         getPhantomWallet(),
-        getSlopeWallet(),
         getSolflareWallet(),
+        getSolletExtensionWallet({ network }),
+        getSolletWallet({ network }),
+        getSlopeWallet(),
         getTorusWallet({
             options: { clientId: 'Get a client ID @ https://developer.tor.us' }
         }),
         getLedgerWallet(),
-        getSolletWallet({ network }),
-        getSolletExtensionWallet({ network }),
     ], [network]);
 
 
